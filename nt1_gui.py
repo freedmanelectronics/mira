@@ -1,6 +1,10 @@
 import tkinter as tk
 import subprocess
 
+from rode.devices.classic.nt_usb_5g import NTUSB5thGenAppDevice
+from rode.devices.utils.device_detection import DeviceDetectionUtils
+from rode.devices.utils.versions import Version
+
 dashboard_py = r"C:\Users\ate\Documents\nt1_gui\mira_dashboard2.py"
 try:
     subprocess.Popen(['python', dashboard_py], shell=True)
@@ -95,6 +99,22 @@ FAIL_MODE_LEGEND = {
     "FM13": "All USB + All XLR + Amp Fail",
     "FM16": "All XLR + Noise Fail"
 }
+
+def verify_firmware(desired_firmware: Version | str) -> bool:
+    if isinstance(desired_firmware, str):
+        desired_firmware = Version(desired_firmware)
+
+    connected_devices = [
+        device
+        for device in DeviceDetectionUtils().get_connected_devices()
+        if isinstance(device, NTUSB5thGenAppDevice)
+    ]
+
+    for device in connected_devices:
+        if device.get_version() != desired_firmware:
+            return False
+
+    return True
 
 def determine_fail_mode(usb_fr, usb_sens, amp, xlr_fr, xlr_sens, noise):
     if usb_fr and usb_sens and amp and xlr_fr and xlr_sens:
