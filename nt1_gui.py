@@ -110,6 +110,9 @@ def verify_firmware(desired_firmware: Version | str) -> bool:
         if isinstance(device, NTUSB5thGenAppDevice)
     ]
 
+    if len(connected_devices) == 0:
+        return False
+
     for device in connected_devices:
         if device.get_version() != desired_firmware:
             return False
